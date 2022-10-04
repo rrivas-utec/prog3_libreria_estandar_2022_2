@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <forward_list>
 #include <algorithm>
+#include <functional>
 using namespace std;
 
 typedef vector<int>::iterator iterator_t;
@@ -105,8 +106,134 @@ void ejemplo_count() {
     cout << cant4 << endl;
 }
 
+template <typename Iterator>
+auto obtener_valor_cambiado(Iterator it, typename Iterator::value_type value) {
+//    // Definir una variable
+//    int x = 0;
+    // Definir una variable del tipo que almacena un iterador
+//    typename Iterator::value_type y = value;
+    auto y = value * 2;
+    return y;
+}
+
+void ejemplo_3() {
+    vector<int> vec = {};
+    auto it = begin(vec);
+    vector<int>::iterator it2 = begin(vec);
+    auto val = obtener_valor_cambiado(it, 20.0);
+    cout << val << endl;
+}
+
+//template <typename Iterator, typename Callable, typename Type = typename Iterator::value_type>
+//Type copiar_si(Iterator start, Iterator stop, Callable func) {
+//
+//}
+
+template <typename Iterator, typename Callable>
+auto contar_si(Iterator start, Iterator stop, Callable func) {
+    int total = 0;
+    while (start != stop) {
+        if (func(*start) == true)
+            total++;
+        start++;
+    }
+    return total;
+}
+
+void ejemplo_4() {
+    list<int> l = {1, 2, 3, 2, 5, 3, 4, 5, 6, 1, 2, 3, 4, 8};
+    int base = 2;
+    auto total = contar_si(begin(l), end(l), [base](int a){
+        auto result = (a % base == 0);
+        return result;
+    });
+    cout << base << endl;
+    cout << total << endl;
+}
+
+void ejemplo_5() {
+    int x = 10;
+    auto lambda = [x](int y) mutable {
+        x *= 10;
+        return x + y;
+    };
+    cout << x << endl;
+    cout << lambda(2) << endl;
+}
+
+void ejemplo_6() {
+    int x = 10;
+    int y = 20;
+    int z = 30;
+    int w = 40;
+    auto lambda = [=](){
+        return x + y  + z + w;
+    };
+
+    auto duplicar = [&](){
+        x *= 2;
+        y *= 2;
+        z *= 2;
+        w *= 2;
+    };
+    cout << lambda() << endl;
+    duplicar();
+    cout << x << y << z << w << endl;
+}
+
+int sumar(int a, int b) {
+    return a + b;
+}
+
+int restar(int a, int b) {
+    return a - b;
+}
+
+// Punteros a funciones
+void ejemplo_7() {
+    int x = 0, y = 0;
+    cin >> x >> y;
+
+    // puntero a funciones del tipo: int(int, int)
+    int (*operation)(int, int) = nullptr;
+    if (x > y)
+        operation = restar;
+    else
+        operation = sumar;
+
+    cout << operation(x, y);
+
+}
+
+void ejemplo_8() {
+    // Vector almacena una coleccion de punteros del tipo int(*)(int, int)
+    vector<int(*)(int, int)> vec;
+    vec.push_back(restar);
+    vec.push_back(sumar);
+    int x = 0, y = 0;
+    cin >> x >> y;
+    for (auto& op: vec)
+        cout << op(x, y) << endl;
+}
+
+void ejemplo_9() {
+    list<function<int(int, int)>> lst;
+    lst.emplace_back(restar);
+    lst.emplace_back(sumar);
+    int x = 0, y = 0;
+    cin >> x >> y;
+    for (auto& op: lst)
+        cout << op(x, y) << endl;
+}
+
 int main() {
 //    ejemplo_2();
-    ejemplo_count();
+//    ejemplo_count();
+//    ejemplo_3();
+//    ejemplo_4();
+//    ejemplo_5();
+//    ejemplo_6();
+//    ejemplo_8();
+    ejemplo_9();
     return 0;
 }
